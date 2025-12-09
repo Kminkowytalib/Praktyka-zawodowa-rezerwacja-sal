@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Panel główny";
+}
+
+<div class="text-center">
+    <h1 class="display-4">System Rezerwacji Sal</h1>
+    <p class="lead mt-3">Witamy w nowoczesnym systemie zarządzania rezerwacjami.</p>
+
+    <div style="margin-top:40px;">
+        <a asp-controller="Reservations" asp-action="Index" class="btn btn-primary btn-lg m-2">
+            📅 Rezerwacje
+        </a>
+        <a asp-controller="Rooms" asp-action="Index" class="btn btn-primary btn-lg m-2">
+            🏢 Sale
+        </a>
+    </div>
+</div>

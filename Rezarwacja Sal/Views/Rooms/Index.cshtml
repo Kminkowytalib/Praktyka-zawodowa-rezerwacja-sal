@@ -1,0 +1,43 @@
+@model IEnumerable<Rezarwacja_Sal.Models.Room>
+@{
+    ViewData["Title"] = "Zarządzanie salami";
+}
+<h1 class="mb-3">@ViewData["Title"]</h1>
+<p>
+    <a class="btn btn-primary btn-icon-text" asp-action="Create"><i class="bi bi-plus-circle"></i>Dodaj salę</a>
+</p>
+<div class="table-responsive">
+    <table class="table table-sm table-striped table-hover align-middle table-sticky">
+        <thead class="table-light">
+            <tr>
+                <th>Nazwa</th>
+                <th>Lokalizacja</th>
+                <th>Pojemność</th>
+                <th>Status</th>
+                <th>Wyposażenie</th>
+                <th class="text-end">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+@foreach (var item in Model)
+{
+            <tr>
+                <td class="fw-semibold">@item.Name</td>
+                <td>@item.Location</td>
+                <td><span class="badge bg-secondary rounded-pill px-3">@item.Capacity</span></td>
+                <td>
+                    @if(item.IsActive){<span class="badge bg-success rounded-pill px-3">Aktywna</span>} else {<span class="badge bg-secondary rounded-pill px-3">Nieaktywna</span>}
+                </td>
+                <td class="text-truncate" style="max-width: 300px;" title="@item.Equipment">@item.Equipment</td>
+                <td class="text-end">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a class="btn btn-outline-primary btn-icon-text" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="Edytuj"><i class="bi bi-pencil-square"></i>Edytuj</a>
+                        <a class="btn btn-outline-info btn-icon-text" asp-action="Details" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="Szczegóły"><i class="bi bi-info-circle"></i>Szczegóły</a>
+                        <a class="btn btn-outline-danger btn-icon-text" asp-action="Delete" asp-route-id="@item.Id" data-bs-toggle="tooltip" title="Usuń"><i class="bi bi-trash"></i>Usuń</a>
+                    </div>
+                </td>
+            </tr>
+}
+        </tbody>
+    </table>
+</div>

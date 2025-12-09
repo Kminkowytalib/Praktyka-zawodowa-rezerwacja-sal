@@ -1,0 +1,154 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* --- App UI polish --- */
+.badge-pill {
+  border-radius: 999px;
+  padding: 0.4rem 0.6rem;
+}
+
+.table-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bs-light);
+}
+
+.btn-icon-text i {
+  margin-right: .35rem;
+}
+
+.calendar-today {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+  background-clip: padding-box;
+}
+
+.calendar-legend .legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-right: 1rem;
+  font-size: .9rem;
+}
+.calendar-legend .color-box {
+  width: 12px; height: 12px; border-radius: 2px; display: inline-block;
+}
+
+/* --- Site-wide theme (aligned with login style) --- */
+:root {
+  --app-gradient-start: #343a40; /* dark */
+  --app-gradient-end: #495057;   /* gray-dark */
+  --app-accent: #198754;         /* Bootstrap success */
+}
+
+/* Subtle background and rounded containers */
+body {
+  background: #f7f8fa;
+}
+
+/* Navbar gradient */
+.app-navbar {
+  background: linear-gradient(135deg, var(--app-gradient-start), var(--app-gradient-end));
+}
+.app-navbar .navbar-brand, .app-navbar .nav-link, .app-navbar .navbar-text {
+  color: #fff !important;
+}
+.app-navbar .nav-link.active, .app-navbar .nav-link:hover { opacity: .9; }
+
+/* Card headers with gradient */
+.card > .card-header {
+  background: linear-gradient(135deg, var(--app-gradient-start), var(--app-gradient-end));
+  color: #fff;
+}
+
+/* Buttons: icon spacing and primary accent override */
+.btn-icon-text i { margin-right: .45rem; }
+.btn-primary {
+  background-color: var(--app-accent);
+  border-color: var(--app-accent);
+}
+.btn-primary:hover { filter: brightness(0.95); }
+
+/* Breadcrumbs compact */
+.breadcrumb { --bs-breadcrumb-divider: ">"; font-size: .95rem; }
+
+/* Alerts slightly rounded */
+.alert { border-radius: .5rem; }
+
+/* === NOWOCZESNY WYGLĄD STRONY === */
+
+body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+    .navbar a {
+        color: #fff !important;
+        font-weight: 500;
+    }
+
+h1, h2, h3 {
+    font-weight: 700;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4);
+    margin-top: 40px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+}
+
+    .btn-primary:hover {
+        transform: scale(1.03);
+        transition: 0.2s ease-in-out;
+    }
+
+/* Tabela */
+table {
+    background: rgba(0,0,0,0.4);
+    color: white;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+    table th {
+        background: rgba(0,0,0,0.6);
+        color: #00c6ff;
+    }
+
+/* Linki */
+a {
+    color: #00c6ff;
+    text-decoration: none;
+}

@@ -1,0 +1,97 @@
+@model IEnumerable<Rezarwacja_Sal.Models.Reservation>
+@{
+    ViewData["Title"] = "Wszystkie rezerwacje";
+}
+<h1 class="mb-2">@ViewData["Title"]</h1>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb mb-2">
+    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Start</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Wszystkie rezerwacje</li>
+  </ol>
+</nav>
+<p class="text-muted">Lista wszystkich rezerwacji. Możesz akceptować lub odrzucać oczekujące wnioski.</p>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-md-4 col-lg-3">
+        <label class="form-label" for="roomId">Sala</label>
+        <select class="form-select" id="roomId" name="roomId" asp-items="ViewBag.Rooms">
+            <option value="">(wszystkie)</option>
+        </select>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <label class="form-label" for="status">Status</label>
+        <select class="form-select" id="status" name="status" asp-items="ViewBag.Statuses">
+            <option value="">(wszystkie)</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label class="form-label" for="from">Od dnia</label>
+        <input type="date" class="form-control" id="from" name="from" value="@ViewBag.FilterFrom" />
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label class="form-label" for="to">Do dnia</label>
+        <input type="date" class="form-control" id="to" name="to" value="@ViewBag.FilterTo" />
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <label class="form-label" for="q">Tytuł zawiera</label>
+        <input type="text" class="form-control" id="q" name="q" value="@ViewBag.FilterQ" placeholder="Szukaj w tytule..." />
+    </div>
+    <div class="col-sm-12 col-lg-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">Filtruj</button>
+        <a class="btn btn-outline-secondary flex-fill" asp-action="Index">Wyczyść</a>
+    </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-sm table-striped table-hover align-middle table-sticky">
+        <thead class="table-light">
+            <tr>
+                <th class="text-nowrap">#</th>
+                <th>Sala</th>
+                <th>Od</th>
+                <th>Do</th>
+                <th>Tytuł</th>
+                <th>Status</th>
+                <th>Użytkownik</th>
+                <th class="text-end">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+@foreach (var r in Model)
+{
+            <tr>
+                <td class="text-muted">@r.Id</td>
+                <td>@r.RoomId</td>
+                <td>@r.StartAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@r.EndAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td class="fw-semibold text-truncate" style="max-width: 320px;" title="@r.Title">@r.Title</td>
+                <td>
+                    <partial name="_StatusBadge" model="r.Status" />
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(r.CreatedByUserId))
+                    {
+                        <a asp-action="UserDetails" asp-route-id="@r.CreatedByUserId">@r.CreatedByUserId</a>
+                    }
+                </td>
+                <td class="text-end">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a class="btn btn-outline-primary btn-icon-text" asp-action="Details" asp-route-id="@r.Id" data-bs-toggle="tooltip" title="Szczegóły"><i class="bi bi-info-circle"></i>Szczegóły</a>
+                        @if (r.Status == Rezarwacja_Sal.Models.ReservationStatus.Pending)
+                        {
+                            <form asp-action="Approve" asp-route-id="@r.Id" method="post">
+                                <button type="submit" class="btn btn-success btn-icon-text" data-bs-toggle="tooltip" title="Akceptuj"><i class="bi bi-check-circle"></i>Akceptuj</button>
+                            </form>
+                            <form asp-action="Reject" asp-route-id="@r.Id" method="post">
+                                <button type="submit" class="btn btn-outline-danger btn-icon-text" data-bs-toggle="tooltip" title="Odrzuć"><i class="bi bi-x-octagon"></i>Odrzuć</button>
+                            </form>
+                        }
+                        <form asp-action="Delete" asp-route-id="@r.Id" method="post" onsubmit="return confirm('Usunąć tę rezerwację? Tej operacji nie można cofnąć.');">
+                            <button type="submit" class="btn btn-danger btn-icon-text" data-bs-toggle="tooltip" title="Usuń"><i class="bi bi-trash"></i>Usuń</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+}
+        </tbody>
+    </table>
+</div>

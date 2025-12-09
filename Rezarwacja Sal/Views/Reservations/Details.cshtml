@@ -1,0 +1,77 @@
+@model Rezarwacja_Sal.Models.Reservation
+@{
+    ViewData["Title"] = "Szczegóły rezerwacji";
+    var attachments = ViewBag.Attachments as IEnumerable<Rezarwacja_Sal.Models.Attachment> ?? Enumerable.Empty<Rezarwacja_Sal.Models.Attachment>();
+}
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="h5 mb-0">@Model.Title</div>
+            <span class="badge bg-secondary">ID: @Model.Id</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Sala</dt>
+            <dd class="col-sm-9">@Model.RoomId</dd>
+            <dt class="col-sm-3">Od</dt>
+            <dd class="col-sm-9">@Model.StartAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+            <dt class="col-sm-3">Do</dt>
+            <dd class="col-sm-9">@Model.EndAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+            <dt class="col-sm-3">Notatki</dt>
+            <dd class="col-sm-9">@Model.Notes</dd>
+        </dl>
+    </div>
+    <div class="card-footer d-flex gap-2">
+        <a class="btn btn-outline-secondary" asp-action="My">Wróć</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <strong>Załączniki</strong>
+            </div>
+            <div class="card-body">
+                @if (!attachments.Any())
+                {
+                    <div class="text-muted">Brak załączników.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var a in attachments)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="text-truncate" title="@a.OriginalFileName">
+                                    <i class="bi bi-paperclip"></i>
+                                    <span class="fw-semibold">@a.OriginalFileName</span>
+                                    <span class="text-muted">(@(a.SizeBytes/1024) KB)</span>
+                                </div>
+                                <a class="btn btn-sm btn-outline-primary" asp-action="DownloadAttachment" asp-route-id="@a.Id">Pobierz</a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-light"><strong>Dodaj załącznik</strong></div>
+            <div class="card-body">
+                <form method="post" asp-action="UploadAttachment" asp-route-id="@Model.Id" enctype="multipart/form-data" class="vstack gap-2">
+                    <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt" required />
+                    <small class="text-muted">Dozwolone: PDF/DOC/XLSX/PPTX/PNG/JPG/TXT. Maksymalnie 20 MB.</small>
+                    <button type="submit" class="btn btn-primary">Wyślij</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

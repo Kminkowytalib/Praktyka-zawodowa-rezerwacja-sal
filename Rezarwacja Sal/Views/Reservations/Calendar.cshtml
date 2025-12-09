@@ -1,0 +1,148 @@
+@model IEnumerable<Rezarwacja_Sal.Models.Reservation>
+@using Rezarwacja_Sal.Models
+@{
+    ViewData["Title"] = "Kalendarz sali";
+    var view = (string)(ViewBag.View ?? "week");
+    DateTime rangeStart = (DateTime)ViewBag.RangeStart;
+    DateTime rangeEnd = (DateTime)ViewBag.RangeEnd;
+    int selectedRoomId = (int)ViewData["SelectedRoomId"]!;
+}
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-md-5 col-lg-4">
+        <label class="form-label" for="roomId">Sala</label>
+        <select id="roomId" name="roomId" class="form-select" asp-items="ViewBag.Rooms"></select>
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <label class="form-label" for="date">Data</label>
+        <input id="date" name="date" type="date" class="form-control" value="@rangeStart.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-sm-6 col-md-3 col-lg-2">
+        <label class="form-label" for="view">Widok</label>
+        <select id="view" name="view" class="form-select">
+            <option value="week" selected="@(view=="week" ? "selected" : null)">Tydzień</option>
+            <option value="month" selected="@(view=="month" ? "selected" : null)">Miesiąc</option>
+        </select>
+    </div>
+    <div class="col-sm-12 col-lg-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">Pokaż</button>
+    </div>
+</form>
+
+@if (view == "week")
+{
+    var days = Enumerable.Range(0,7).Select(i => rangeStart.Date.AddDays(i)).ToArray();
+    var startHour = 8;  
+    var endHour = 20;   
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 90px;">Godzina</th>
+                    @foreach (var d in days)
+                    {
+                        <th class="text-center text-nowrap">@d.ToString("ddd dd.MM")</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (var h = startHour; h < endHour; h++)
+                {
+                    var slotStart = rangeStart.Date.AddHours(h);
+                    <tr>
+                        <th class="text-nowrap">@($"{h:00}:00")</th>
+                        @foreach (var d in days)
+                        {
+                            var cellStart = d.AddHours(h);
+                            var cellEnd = d.AddHours(h+1);
+                            var inCell = Model.Where(r => r.StartAt.ToLocalTime() < cellEnd && r.EndAt.ToLocalTime() > cellStart)
+                                              .OrderBy(r => r.StartAt)
+                                              .ToList();
+                            if (inCell.Any())
+                            {
+                                <td class="bg-warning-subtle" title="@string.Join("\n", inCell.Select(r => $"{r.Title} ({r.StartAt.ToLocalTime():HH:mm}-{r.EndAt.ToLocalTime():HH:mm})"))">
+                                    <div class="small">
+                                        @foreach (var r in inCell.Take(2))
+                                        {
+                                            <div class="text-truncate"><strong>@r.Title</strong> <span class="text-muted">(@r.StartAt.ToLocalTime().ToString("HH:mm")-@r.EndAt.ToLocalTime().ToString("HH:mm"))</span></div>
+                                        }
+                                        @if (inCell.Count > 2)
+                                        {
+                                            <div class="text-muted">+@((inCell.Count - 2)) więcej…</div>
+                                        }
+                                    </div>
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="bg-body"></td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+  
+    var first = rangeStart;
+    int firstDayOfWeek = ((int)first.DayOfWeek + 6) % 7; 
+    var gridStart = first.AddDays(-firstDayOfWeek);
+    var cells = Enumerable.Range(0,42).Select(i => gridStart.AddDays(i)).ToArray();
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center">Pon</th>
+                    <th class="text-center">Wt</th>
+                    <th class="text-center">Śr</th>
+                    <th class="text-center">Czw</th>
+                    <th class="text-center">Pt</th>
+                    <th class="text-center">Sob</th>
+                    <th class="text-center">Nd</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int r = 0; r < 6; r++)
+                {
+                    <tr>
+                        @for (int c = 0; c < 7; c++)
+                        {
+                            var day = cells[r*7 + c];
+                            var dayRes = Model.Where(x => x.StartAt.ToLocalTime().Date <= day.Date && x.EndAt.ToLocalTime().Date >= day.Date)
+                                              .OrderBy(x => x.StartAt)
+                                              .ToList();
+                            var muted = day.Month != rangeStart.Month ? "text-muted" : "";
+                            <td style="height: 130px;">
+                                <div class="d-flex justify-content-between @muted">
+                                    <span class="fw-semibold">@day.Day</span>
+                                </div>
+                                <div class="mt-1" style="max-height: 100px; overflow:auto;">
+                                    @foreach (var res in dayRes)
+                                    {
+                                        <div class="small mb-1 p-1 rounded bg-warning-subtle border">
+                                            <div class="text-truncate"><strong>@res.Title</strong></div>
+                                            <div class="text-muted">@res.StartAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm") - @res.EndAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="alert alert-info mt-3">
+    <strong>Legenda:</strong>
+    <span class="badge bg-warning-subtle border ms-2">zajęte</span>
+    <span class="ms-2 text-muted">puste komórki oznaczają dostępność</span>
+</div>

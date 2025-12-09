@@ -1,0 +1,30 @@
+@model Rezarwacja_Sal.Models.Room
+@{
+    ViewData["Title"] = "Usuń salę";
+}
+<h1>@ViewData["Title"]</h1>
+<h4>Czy na pewno chcesz usunąć tę salę?</h4>
+<div class="card mt-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Nazwa</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Lokalizacja</dt>
+            <dd class="col-sm-9">@Model.Location</dd>
+
+            <dt class="col-sm-3">Pojemność</dt>
+            <dd class="col-sm-9">@Model.Capacity</dd>
+
+            <dt class="col-sm-3">Aktywna</dt>
+            <dd class="col-sm-9">@(Model.IsActive ? "Tak" : "Nie")</dd>
+        </dl>
+    </div>
+</div>
+<div class="mt-3">
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Usuń</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Anuluj</a>
+    </form>
+</div>

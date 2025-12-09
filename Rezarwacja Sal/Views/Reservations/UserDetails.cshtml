@@ -1,0 +1,47 @@
+@model Microsoft.AspNetCore.Identity.IdentityUser
+@{
+    ViewData["Title"] = "Dane użytkownika";
+}
+<h1 class="mb-3">@ViewData["Title"]</h1>
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <div class="d-flex align-items-center gap-3">
+            <span class="h5 mb-0">@Model.UserName</span>
+            <span class="badge bg-secondary">@Model.Id</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 mb-3">
+            <div class="col-sm-4">
+                <div class="p-3 bg-light rounded border h-100">
+                    <div class="text-muted small">Wszystkie rezerwacje</div>
+                    <div class="h4 mb-0">@ViewBag.UserResTotal</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="p-3 bg-light rounded border h-100">
+                    <div class="text-muted small">Zakończone</div>
+                    <div class="h4 mb-0">@ViewBag.UserResPast</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="p-3 bg-light rounded border h-100">
+                    <div class="text-muted small">Aktywne (zatwierdzone przyszłe)</div>
+                    <div class="h4 mb-0">@ViewBag.UserResActive</div>
+                </div>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Login (UserName):</strong> @Model.UserName</li>
+            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+            <li class="list-group-item"><strong>Email potwierdzony:</strong> @(Model.EmailConfirmed ? "Tak" : "Nie")</li>
+            <li class="list-group-item"><strong>Telefon:</strong> @Model.PhoneNumber</li>
+            <li class="list-group-item"><strong>Lockout włączony:</strong> @(Model.LockoutEnabled ? "Tak" : "Nie")</li>
+            <li class="list-group-item"><strong>Lockout kończy się:</strong> @(Model.LockoutEnd?.ToString("yyyy-MM-dd HH:mm") ?? "—")</li>
+            <li class="list-group-item"><strong>Two Factor Enabled:</strong> @(Model.TwoFactorEnabled ? "Tak" : "Nie")</li>
+        </ul>
+    </div>
+    <div class="card-footer d-flex gap-2">
+        <a class="btn btn-outline-secondary" asp-action="Index">Wróć do listy rezerwacji</a>
+    </div>
+</div>

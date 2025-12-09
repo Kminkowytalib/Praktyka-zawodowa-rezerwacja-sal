@@ -1,0 +1,112 @@
+@model Rezarwacja_Sal.Models.Room
+@{
+    ViewData["Title"] = "Szczegóły sali";
+}
+<h1 class="mb-3">@ViewData["Title"]</h1>
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <div class="d-flex align-items-center gap-3">
+            <span class="h5 mb-0">@Model.Name</span>
+            <span class="badge bg-secondary">@Model.Capacity</span>
+            @if (Model.IsActive)
+            {
+                <span class="badge bg-success">Aktywna</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Nieaktywna</span>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Lokalizacja:</strong> @Model.Location</li>
+            <li class="list-group-item" style="white-space: pre-wrap;"><strong>Wyposażenie:</strong> @Model.Equipment</li>
+        </ul>
+    </div>
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edytuj</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Wróć do listy</a>
+    </div>
+</div>
+
+@{ 
+    var monthStart = (DateTime)ViewBag.MonthStart;
+    var monthEnd = (DateTime)ViewBag.MonthEnd;
+    var reservations = ViewBag.Reservations as IEnumerable<Rezarwacja_Sal.Models.Reservation> ?? Enumerable.Empty<Rezarwacja_Sal.Models.Reservation>();
+    var firstDayOfWeek = ((int)monthStart.DayOfWeek + 6) % 7; // Monday=0
+    var gridStart = monthStart.AddDays(-firstDayOfWeek);
+    var cells = Enumerable.Range(0,42).Select(i => gridStart.AddDays(i)).ToArray();
+    var prev = monthStart.AddMonths(-1);
+    var next = monthStart.AddMonths(1);
+
+    // Color palette and map: each reservation gets a distinct color
+    var palette = new [] {
+        "#4dabf7", "#69db7c", "#ffd43b", "#ff6b6b", "#845ef7", "#22b8cf", "#ffa94d", "#e599f7",
+        "#a5d8ff", "#b2f2bb", "#fff3bf", "#ffc9c9", "#d0bfff", "#99e9f2", "#ffd8a8", "#fcc2d7"
+    };
+    var colorMap = reservations
+        .Select((r, idx) => new { r.Id, Color = palette[idx % palette.Length] })
+        .ToDictionary(x => x.Id, x => x.Color);
+}
+
+<h2 class="mt-4">Kalendarz zajętości</h2>
+<div class="mx-auto" style="max-width: 900px;">
+    <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Id" asp-route-date="@prev.ToString("yyyy-MM-01")">◀ Poprzedni</a>
+        <div class="fw-semibold">@monthStart.ToString("MMMM yyyy")</div>
+        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Id" asp-route-date="@next.ToString("yyyy-MM-01")">Następny ▶</a>
+        <a class="btn btn-sm btn-outline-primary" asp-controller="Reservations" asp-action="Calendar" asp-route-roomId="@Model.Id" asp-route-view="month" asp-route-date="@monthStart.ToString("yyyy-MM-01")">Pełny kalendarz</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle w-auto mx-auto">
+        <thead class="table-light">
+            <tr>
+                <th class="text-center">Pon</th>
+                <th class="text-center">Wt</th>
+                <th class="text-center">Śr</th>
+                <th class="text-center">Czw</th>
+                <th class="text-center">Pt</th>
+                <th class="text-center">Sob</th>
+                <th class="text-center">Nd</th>
+            </tr>
+        </thead>
+        <tbody>
+        @for (int r = 0; r < 6; r++)
+        {
+            <tr>
+            @for (int c = 0; c < 7; c++)
+            {
+                var day = cells[r*7 + c];
+                var dayRes = reservations.Where(x => x.StartAt.ToLocalTime().Date <= day.Date && x.EndAt.ToLocalTime().Date >= day.Date).ToList();
+                var muted = day.Month != monthStart.Month ? "text-muted" : "";
+                var isToday = day.Date == DateTime.Today;
+                <td class="@(isToday ? "calendar-today" : null)" style="height: 90px;">
+                    <div class="d-flex justify-content-between @muted">
+                        <span class="fw-semibold">@day.Day</span>
+                        @* usuwamy badge, kolorujemy paskami poniżej *@
+                    </div>
+                    <div class="mt-2" style="max-height: 70px; overflow:hidden;">
+                        @foreach (var res in dayRes)
+                        {
+                            var color = colorMap.TryGetValue(res.Id, out var col) ? col : palette[res.Id % palette.Length];
+                            <div title="@res.Title"
+                                 style="height:8px; margin-bottom:3px; border-radius:4px; background-color:@color;"></div>
+                        }
+                    </div>
+                </td>
+            }
+            </tr>
+        }
+        </tbody>
+    </table>
+    </div>
+    <div class="calendar-legend mt-2">
+        <div class="legend-item"><span class="color-box" style="background-color:#a5a5a5"></span><span>Dzisiaj podkreślony ramką</span></div>
+        @foreach (var pair in colorMap.Take(6))
+        {
+            var label = reservations.FirstOrDefault(r => r.Id == pair.Key)?.Title ?? ("Rezerwacja " + pair.Key);
+            <div class="legend-item"><span class="color-box" style="background-color:@pair.Value"></span><span class="text-truncate" style="max-width:220px" title="@label">@label</span></div>
+        }
+    </div>
+</div>

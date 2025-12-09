@@ -1,0 +1,56 @@
+@model IEnumerable<Rezarwacja_Sal.Models.Reservation>
+@{
+    ViewData["Title"] = "Moje rezerwacje";
+}
+<h1 class="mb-2">@ViewData["Title"]</h1>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb mb-2">
+    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Start</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Moje rezerwacje</li>
+  </ol>
+  </nav>
+<p class="text-muted mb-4">Lista Twoich rezerwacji. Widzisz tu tylko rezerwacje złożone z Twojego konta.</p>
+<div class="table-responsive">
+    <table class="table table-sm table-striped table-hover align-middle table-sticky">
+        <thead class="table-light">
+            <tr>
+                <th class="text-nowrap">#</th>
+                <th>Sala</th>
+                <th>Od</th>
+                <th>Do</th>
+                <th>Tytuł</th>
+                <th>Status</th>
+                <th class="text-end">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+@foreach (var r in Model)
+{
+            <tr>
+                <td class="text-muted">@r.Id</td>
+                <td>@r.RoomId</td>
+                <td>@r.StartAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@r.EndAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td class="fw-semibold text-truncate" style="max-width: 320px;" title="@r.Title">@r.Title</td>
+                <td>
+                    <partial name="_StatusBadge" model="r.Status" />
+                </td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary me-1 btn-icon-text" asp-action="Details" asp-route-id="@r.Id" data-bs-toggle="tooltip" title="Szczegóły"><i class="bi bi-info-circle"></i>Szczegóły</a>
+                    @if ((r.Status == Rezarwacja_Sal.Models.ReservationStatus.Pending || r.Status == Rezarwacja_Sal.Models.ReservationStatus.Approved)
+                         && r.EndAt.ToLocalTime() > DateTime.Now)
+                    {
+                        <form asp-action="Cancel" asp-route-id="@r.Id" method="post" class="d-inline" onsubmit="return confirm('Anulować tę rezerwację?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger btn-icon-text" data-bs-toggle="tooltip" title="Anuluj"><i class="bi bi-x-circle"></i>Anuluj</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+}
+        </tbody>
+    </table>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Nie masz jeszcze żadnych rezerwacji.</div>
+    }
+</div>

@@ -1,0 +1,16 @@
+@model Rezarwacja_Sal.Models.ReservationStatus
+@switch (Model)
+{
+    case Rezarwacja_Sal.Models.ReservationStatus.Pending:
+        <span class="badge bg-warning text-dark rounded-pill px-3">Oczekuje</span>
+        break;
+    case Rezarwacja_Sal.Models.ReservationStatus.Approved:
+        <span class="badge bg-success rounded-pill px-3">Zatwierdzona</span>
+        break;
+    case Rezarwacja_Sal.Models.ReservationStatus.Rejected:
+        <span class="badge bg-danger rounded-pill px-3">Odrzucona</span>
+        break;
+    case Rezarwacja_Sal.Models.ReservationStatus.Cancelled:
+        <span class="badge bg-secondary rounded-pill px-3">Anulowana</span>
+        break;
+}
