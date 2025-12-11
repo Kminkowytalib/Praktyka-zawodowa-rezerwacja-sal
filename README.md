@@ -80,12 +80,6 @@ wchodzi do Reservations/Index
 
 akceptuje / odrzuca
 
-📅 Kalendarz / sala
-
-Rooms/Details/{id} → widok miesiąca
-
-Reservations/Calendar?roomId= → widok tygodnia lub miesiąca
-
 📎 Załączniki
 
 W szczegółach rezerwacji możesz wrzucać PDF, DOC, XLSX, PNG itd.
