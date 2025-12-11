@@ -1,47 +1,110 @@
-Rezerwacja Sal – szybka instrukcja
-Wymagania
-.NET SDK 8.0+
+🔧 Co potrzebujesz
+
+.NET 8
+
 SQL Server (np. LocalDB)
-Przeglądarka (Chrome/Edge/Firefox)
-Konfiguracja
-W pliku appsettings.json ustaw ConnectionStrings:DefaultConnection.
-Zastosuj migracje bazy:
-dotnet tool update --global dotnet-ef
+
+Przeglądarka
+
+I to w sumie tyle.
+
+⚙️ Jak to uruchomić (krótko)
+
+W pliku appsettings.json wpisujesz poprawny connection string do bazy.
+
+Odpalasz migracje:
+
+Terminal:
+
 dotnet ef database update
-lub w Visual Studio:
+
+
+albo Visual Studio → Package Manager Console:
+
 Update-Database
-Uruchomienie
-dotnet build
-dotnet run --project "Rezarwacja Sal.csproj"
-Aplikacja uruchomi się pod adresem podanym w konsoli.
-Role
-Użytkownik:
-Tworzy rezerwacje (Reservations/Create)
-Zarządza swoimi (Reservations/My)
-Manager:
-Widzi wszystkie rezerwacje (Reservations/Index)
-Może je zatwierdzać, odrzucać i usuwać
-Widzi alerty o oczekujących rezerwacjach po zalogowaniu
-Konta testowe
-Zarejestruj:
+
+
+Potem tylko:
+
+dotnet run
+
+
+W przeglądarce wchodzisz na adres, który wyświetli się w konsoli (np. https://localhost:12345
+).
+
+I działa.
+
+👥 Role – kto co może
+Zwykły użytkownik
+
+robi rezerwację
+
+widzi swoje rezerwacje
+
+może anulować przyszłe
+
+Manager
+
+widzi wszystkie rezerwacje
+
+akceptuje, odrzuca, usuwa
+
+ma osobny panel ze szczegółami użytkowników
+
+🧪 Konta testowe (proponowane)
+
+Rejestrujesz dwa konta:
+
 user@test.local
+
 manager@test.local
-Aby nadać rolę Manager (SQL):
-INSERT INTO AspNetRoles (Id, Name, NormalizedName)
-SELECT NEWID(), 'Manager', 'MANAGER'
-WHERE NOT EXISTS (SELECT 1 FROM AspNetRoles WHERE NormalizedName = 'MANAGER');
-DECLARE @RoleId nvarchar(450) = (SELECT Id FROM AspNetRoles WHERE NormalizedName='MANAGER');
-DECLARE @UserId nvarchar(450) = (SELECT Id FROM AspNetUsers WHERE NormalizedEmail='MANAGER@TEST.LOCAL');
-IF NOT EXISTS (SELECT 1 FROM AspNetUserRoles WHERE UserId=@UserId AND RoleId=@RoleId)
-INSERT INTO AspNetUserRoles (UserId, RoleId) VALUES (@UserId, @RoleId);
-Scenariusze
-Nowa rezerwacja → Reservations/Create
-Akceptacja/Odrzucenie → Reservations/Index
-Moje rezerwacje → Reservations/My
-Kalendarz sali → Rooms/Details/{id} lub Reservations/Calendar?roomId={id}
-Załączniki
-Obsługiwane: PDF, DOC, XLSX, PPTX, PNG, JPG, TXT (do 20 MB).
-Problemy
-Brak ikon → sprawdź Bootstrap Icons w _Layout.cshtml
-Błędy bazy → sprawdź connection string i uruchom migracje
-Zmiany CSS → odśwież stronę Ctrl + F5
+
+Do drugiego dodajesz rolę Manager (SQL-em lub ręcznie w DB).
+
+I już masz komplet.
+
+🔄 Jak wygląda praca w systemie
+🧑 Użytkownik
+
+wchodzi → Reservations/Create
+
+wybiera salę, daty → wysyła → status Pending
+
+👨‍💼 Manager
+
+loguje się
+
+widzi baner: „Masz oczekujące rezerwacje”
+
+wchodzi do Reservations/Index
+
+akceptuje / odrzuca
+
+📅 Kalendarz / sala
+
+Rooms/Details/{id} → widok miesiąca
+
+Reservations/Calendar?roomId= → widok tygodnia lub miesiąca
+
+📎 Załączniki
+
+W szczegółach rezerwacji możesz wrzucać PDF, DOC, XLSX, PNG itd.
+Do 20 MB.
+
+🎨 Wygląd
+
+bootstrap 5
+
+schludne tabele
+
+małe kolorowe badge do statusów
+
+ładne logowanie
+
+🛠️ Gdy coś nie działa
+
+migracje nie wchodzą? → sprawdź connection string i dotnet ef database update
+
+CSS nie wchodzi? → Ctrl + F5
+
+ikony nie działają? → sprawdź CDN Bootstrap Icons
